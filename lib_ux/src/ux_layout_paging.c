@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 *   Ledger Nano S - Secure firmware
-*   (c) 2021 Ledger
+*   (c) 2022 Ledger
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -129,6 +129,7 @@ static const bagl_element_t* ux_layout_paging_prepro_by_func(const bagl_element_
 
 // redisplay current page
 void ux_layout_paging_redisplay_common(unsigned int stack_slot, const char* text, button_push_callback_t button_callback, bagl_element_callback_t prepro) {
+  bagl_font_id_e  font_id;
   ux_stack_slot_t* slot = &G_ux.stack[stack_slot];
 #if (BAGL_WIDTH==128 && BAGL_HEIGHT==64)
   slot->element_arrays[0].element_array = ux_layout_paging_elements;
@@ -138,11 +139,17 @@ void ux_layout_paging_redisplay_common(unsigned int stack_slot, const char* text
   ux_layout_bb_init_common(stack_slot);
 #endif // (BAGL_WIDTH==128 && BAGL_HEIGHT==64)
 
+  // Use the correct font, to be able to compute correctly text width:
+  if (G_ux.layout_paging.format & PAGING_FORMAT_NB) {
+    font_id = BAGL_FONT_OPEN_SANS_EXTRABOLD_11px;
+  } else {
+    font_id = BAGL_FONT_OPEN_SANS_REGULAR_11px;
+  }
   // request offsets and lengths of lines for the current page
   ux_layout_paging_compute(text, 
                            G_ux.layout_paging.current, 
                            &G_ux.layout_paging,
-                           LINE_FONT);
+                           font_id);
 
   slot->screen_before_element_display_callback = prepro;
   slot->button_push_callback = button_callback;
@@ -216,6 +223,8 @@ static unsigned int ux_layout_paging_button_callback_by_func(unsigned int button
 
 void ux_layout_paging_init_common(unsigned int stack_slot, const char* text, ux_layout_paging_redisplay_t redisplay) {
 
+  bagl_font_id_e  font_id;
+
   // At this very moment, we don't want to get rid of the format, but keep
   // the one which has just been set (in case of direction backward or forward).
   unsigned int backup_format = G_ux.layout_paging.format;
@@ -248,8 +257,15 @@ void ux_layout_paging_init_common(unsigned int stack_slot, const char* text, ux_
     text = ""; // empty string to avoid disrupting the ux flow.
   }
 
+  // Use the correct font, to be able to compute correctly text width:
+  if (G_ux.layout_paging.format & PAGING_FORMAT_NB) {
+    font_id = BAGL_FONT_OPEN_SANS_EXTRABOLD_11px;
+  } else {
+    font_id = BAGL_FONT_OPEN_SANS_REGULAR_11px;
+  }
+
   // count total number of pages
-  G_ux.layout_paging.count = ux_layout_paging_compute(text, -1UL, &G_ux.layout_paging, LINE_FONT); // at least one page
+  G_ux.layout_paging.count = ux_layout_paging_compute(text, -1UL, &G_ux.layout_paging, font_id); // at least one page
 
   if (G_ux.layout_paging.count == 0) {
     ux_layout_paging_reset();

@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 *   Ledger Nano S - Secure firmware
-*   (c) 2021 Ledger
+*   (c) 2022 Ledger
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -204,7 +204,9 @@ extern u2f_service_t G_io_u2f;
  * Wait until a UX call returns a definitve status. Handle all event packets in
  * between
  */
+#if !defined(APP_UX)
 unsigned int os_ux_blocking(bolos_ux_params_t *params);
+#endif // !defined(APP_UX)
 
 /**
  * Global type that enables to map memory onto the application zone instead of
@@ -238,6 +240,7 @@ typedef struct io_seph_s {
   unsigned char disabling_advertising;
 #endif // HAVE_BLE
 
+  unsigned char transfer_mode;
 } io_seph_app_t;
 
 extern io_seph_app_t G_io_app;
@@ -267,6 +270,7 @@ void io_seproxyhal_disable_io(void);
 void io_seph_ble_enable(unsigned char enable);
 void io_seph_ble_clear_bond_db(void);
 #endif // HAVE_BLE
+void io_seph_ux_redisplay(void);
 
 /**
  * Function to ensure a I/O channel is not timeouting waiting for operations

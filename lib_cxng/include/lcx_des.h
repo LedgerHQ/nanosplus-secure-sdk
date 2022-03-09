@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 *   Ledger Nano S - Secure firmware
-*   (c) 2021 Ledger
+*   (c) 2022 Ledger
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ cx_err_t cx_des_init_key_no_throw(const uint8_t *rawkey, size_t key_len, cx_des_
  * 
  * @throws             CX_INVALID_PARAMETER
  */
-static inline int cx_des_init_key ( const unsigned char * rawkey, unsigned int key_len, cx_des_key_t * key )
+static inline size_t cx_des_init_key ( const unsigned char * rawkey, unsigned int key_len, cx_des_key_t * key )
 {
   CX_THROW(cx_des_init_key_no_throw(rawkey, key_len, key));
   return key_len;
@@ -175,7 +175,7 @@ cx_err_t cx_des_iv_no_throw(const cx_des_key_t *key,
  * @throws            CX_INVALID_PARAMETER
  * @throws            INVALID_PARAMETER
  */
-static inline int cx_des_iv ( const cx_des_key_t * key, int mode, unsigned char * iv, unsigned int iv_len, const unsigned char * in, unsigned int in_len, unsigned char * out, unsigned int out_len )
+static inline size_t cx_des_iv ( const cx_des_key_t * key, uint32_t mode, unsigned char * iv, unsigned int iv_len, const unsigned char * in, unsigned int in_len, unsigned char * out, unsigned int out_len )
 {
   size_t out_len_ = out_len;
   CX_THROW(cx_des_iv_no_throw(key, mode, iv, iv_len, in, in_len, out, &out_len_));
@@ -260,7 +260,7 @@ cx_err_t cx_des_no_throw(const cx_des_key_t *key, uint32_t mode, const uint8_t *
  * @throws            CX_INVALID_PARAMETER
  * @throws            INVALID_PARAMETER
  */
-static inline int cx_des ( const cx_des_key_t * key, int mode, const unsigned char * in, unsigned int in_len, unsigned char * out, unsigned int out_len )
+static inline size_t cx_des ( const cx_des_key_t * key, uint32_t mode, const unsigned char * in, unsigned int in_len, unsigned char * out, unsigned int out_len )
 {
   size_t out_len_ = out_len;
   CX_THROW(cx_des_no_throw(key, mode, in, in_len, out, &out_len_));

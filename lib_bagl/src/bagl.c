@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 *   Ledger Nano S - Secure firmware
-*   (c) 2021 Ledger
+*   (c) 2022 Ledger
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -160,8 +160,8 @@ unsigned short bagl_compute_line_width(unsigned short font_id, unsigned short wi
     switch(text_encoding) {
       default:
       case BAGL_ENCODING_LATIN1:
-        ch = *((unsigned char*)text);
-        text = (void*)(((unsigned char*)text)+1);
+        ch = *((const uint8_t *) text);
+        text = (const void *)(((const uint8_t *) text) + 1);
         break;
     }
 
@@ -276,14 +276,14 @@ int bagl_draw_string(unsigned short font_id, unsigned int fgcolor, unsigned int 
       case BAGL_ENCODING_LATIN1:
         // avoid 2 new line on \r and \n for windows familiar users
         if (ch == '\r') {
-          ch = *((unsigned char*)text);
+          ch = *((const uint8_t *) text);
           if (ch == '\n') {
-            text = (void*)(((unsigned int)text)+1);
+            text = (const void *)(((unsigned int) text) + 1);
             continue;
           }
         }
         else {
-          ch = *((unsigned char*)text);
+          ch = *((const uint8_t *) text);
         }
         text = (void*)(((unsigned int)text)+1);
         break;
@@ -570,7 +570,7 @@ idx_ok:
           unsigned int robin = 0; // remove char by char either on the left or right side
           unsigned int dots_len = bagl_compute_line_width(component->font_id, 100 /*probably larger than ... whatever the font*/, "...", 3, context_encoding);
           ellipsis_1_len = context_length/2;
-          ellipsis_2_start = ((char*)context) + context_length/2;
+          ellipsis_2_start = ((const char*)context) + context_length/2;
           // split line in 2 halves, strip a char from end of left part, and from start of right part, reassemble with ... , repeat until it fits.
           // NOTE: algorithm is wrong if special blank chars are inserted, they should be removed first
           while (strwidth > component->width && ellipsis_1_len && (context_length - ((unsigned int)ellipsis_2_start-(unsigned int)context) )) {
@@ -787,7 +787,7 @@ idx_ok:
                                  3,
                                  context_encoding);
           // draw the right part
-          pos = bagl_draw_string(component->font_id,
+          bagl_draw_string(component->font_id,
                                  fgcolor, bgcolor,
                                  (pos & 0xFFFF),
                                  component->y + ((type==BAGL_LABELINE)?-(baseline):valignment),

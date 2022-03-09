@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 *   Ledger Nano S - Secure firmware
-*   (c) 2021 Ledger
+*   (c) 2022 Ledger
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -299,6 +299,39 @@ unsigned int io_seproxyhal_handle_event(void) {
       return 1;
   #endif // HAVE_BLE
 
+    case SEPROXYHAL_TAG_UX_EVENT:
+      switch (G_io_seproxyhal_spi_buffer[3]) {
+
+#ifdef HAVE_BLE
+      case SEPROXYHAL_TAG_UX_CMD_BLE_DISABLE_ADV:
+        LEDGER_BLE_enable_advertising(0);
+        return 1;
+        break;
+
+      case SEPROXYHAL_TAG_UX_CMD_BLE_ENABLE_ADV:
+        LEDGER_BLE_enable_advertising(1);
+        return 1;
+        break;
+
+      case SEPROXYHAL_TAG_UX_CMD_BLE_RESET_PAIRINGS:
+        LEDGER_BLE_reset_pairings();
+        return 1;
+        break;
+#endif // HAVE_BLE
+
+#ifndef HAVE_BOLOS
+      case SEPROXYHAL_TAG_UX_CMD_REDISPLAY:
+        ux_stack_redisplay();
+        return 1;
+        break;
+#endif // HAVE_BOLOS
+
+      default:
+        return io_event(CHANNEL_SPI);
+        break;
+      }
+      break;
+
     case SEPROXYHAL_TAG_CAPDU_EVENT:
       io_seproxyhal_handle_capdu_event();
       return 1;
@@ -483,7 +516,7 @@ unsigned int io_seproxyhal_touch_over(const bagl_element_t* element, bagl_elemen
   }
 
   // swap colors
-  memcpy(&e, (void*)element, sizeof(bagl_element_t));
+  memcpy(&e, element, sizeof(bagl_element_t));
   e.component.fgcolor = element->overfgcolor;
   e.component.bgcolor = element->overbgcolor;
 
@@ -582,7 +615,7 @@ void io_seproxyhal_touch_element_callback(const bagl_element_t* elements, unsign
         // ask for overing
         if (io_seproxyhal_touch_over(&elements[comp_idx], before_display)) {
           // remember the last touched component
-          G_ux_os.last_touched_not_released_component = (bagl_element_t*)&elements[comp_idx];
+          G_ux_os.last_touched_not_released_component = &elements[comp_idx];
           return;
         }
       }
@@ -652,7 +685,7 @@ void io_seproxyhal_display_bitmap(int x, int y, unsigned int w, unsigned int h, 
 }
 
 #ifdef SEPROXYHAL_TAG_SCREEN_DISPLAY_RAW_STATUS
-unsigned int io_seproxyhal_display_icon_header_and_colors(bagl_component_t* icon_component, bagl_icon_details_t* icon_details, unsigned int* icon_len) {
+unsigned int io_seproxyhal_display_icon_header_and_colors(const bagl_component_t* icon_component, const bagl_icon_details_t* icon_details, unsigned int* icon_len) {
   unsigned int len;
 
   struct display_raw_s {
@@ -708,7 +741,7 @@ unsigned int io_seproxyhal_display_icon_header_and_colors(bagl_component_t* icon
   SWAP(raw.h.b[0], raw.h.b[1]);
 
   io_seproxyhal_spi_send((unsigned char*)&raw, sizeof(raw));
-  io_seproxyhal_spi_send((unsigned char*)(PIC(icon_details->colors)), (1<<raw.bpp)*4);
+  io_seproxyhal_spi_send((const uint8_t *) PIC(icon_details->colors), (1<<raw.bpp)*4);
   len -= (1<<raw.bpp)*4;
 
   // remaining length of bitmap bits to be displayed
@@ -716,13 +749,13 @@ unsigned int io_seproxyhal_display_icon_header_and_colors(bagl_component_t* icon
 }
 #endif // SEPROXYHAL_TAG_SCREEN_DISPLAY_RAW_STATUS
 
-void io_seproxyhal_display_icon(bagl_component_t* icon_component, bagl_icon_details_t* icon_det) {
+void io_seproxyhal_display_icon(const bagl_component_t* icon_component, const bagl_icon_details_t* icon_det) {
   bagl_component_t icon_component_mod;
-  const bagl_icon_details_t* icon_details = (bagl_icon_details_t*)PIC(icon_det);
+  const bagl_icon_details_t* icon_details = (const bagl_icon_details_t *)PIC(icon_det);
 
   if (icon_details && icon_details->bitmap) {
     // ensure not being out of bounds in the icon component agianst the declared icon real size
-    memcpy(&icon_component_mod, (void *)PIC(icon_component), sizeof(bagl_component_t));
+    memcpy(&icon_component_mod, PIC(icon_component), sizeof(bagl_component_t));
     icon_component_mod.width = icon_details->width;
     icon_component_mod.height = icon_details->height;
     icon_component = &icon_component_mod;
@@ -732,7 +765,7 @@ void io_seproxyhal_display_icon(bagl_component_t* icon_component, bagl_icon_deta
     unsigned int icon_len;
     unsigned int icon_off=0;
 
-    len = io_seproxyhal_display_icon_header_and_colors(icon_component, (bagl_icon_details_t*)icon_details, &icon_len);
+    len = io_seproxyhal_display_icon_header_and_colors(icon_component, icon_details, &icon_len);
     io_seproxyhal_spi_send(PIC(icon_details->bitmap), len);
     // advance in the bitmap to be transmitted
     icon_len -= len;
@@ -778,11 +811,11 @@ void io_seproxyhal_display_icon(bagl_component_t* icon_component, bagl_icon_deta
     G_io_seproxyhal_spi_buffer[1] = length>>8;
     G_io_seproxyhal_spi_buffer[2] = length;
     io_seproxyhal_spi_send(G_io_seproxyhal_spi_buffer, 3);
-    io_seproxyhal_spi_send((unsigned char*)icon_component, sizeof(bagl_component_t));
+    io_seproxyhal_spi_send((const uint8_t *) icon_component, sizeof(bagl_component_t));
     G_io_seproxyhal_spi_buffer[0] = icon_details->bpp;
     io_seproxyhal_spi_send(G_io_seproxyhal_spi_buffer, 1);
-    io_seproxyhal_spi_send((unsigned char*)PIC(icon_details->colors), h);
-    io_seproxyhal_spi_send((unsigned char*)PIC(icon_details->bitmap), w);
+    io_seproxyhal_spi_send((const uint8_t *) PIC(icon_details->colors), h);
+    io_seproxyhal_spi_send((const uint8_t *) PIC(icon_details->bitmap), w);
 #endif // !HAVE_SE_SCREEN || (HAVE_SE_SCREEN && HAVE_PRINTF)
 #endif // !SEPROXYHAL_TAG_SCREEN_DISPLAY_RAW_STATUS
   }
@@ -802,7 +835,7 @@ void io_seproxyhal_display_default(const bagl_element_t* element) {
         // SECURITY: due to this wild cast, the code MUST be executed on the application side instead of in
         //           the syscall sides to avoid buffer overflows and a real hard way of checking buffer
         //           belonging in the syscall dispatch
-        io_seproxyhal_display_icon((bagl_component_t*)&el->component, (bagl_icon_details_t*)txt);
+        io_seproxyhal_display_icon(&el->component, (const bagl_icon_details_t *) txt);
       }
       else {
 #ifdef HAVE_SE_SCREEN
@@ -820,8 +853,8 @@ void io_seproxyhal_display_default(const bagl_element_t* element) {
         G_io_seproxyhal_spi_buffer[1] = length>>8;
         G_io_seproxyhal_spi_buffer[2] = length;
         io_seproxyhal_spi_send(G_io_seproxyhal_spi_buffer, 3);
-        io_seproxyhal_spi_send((unsigned char*)&el->component, sizeof(bagl_component_t));
-        io_seproxyhal_spi_send((unsigned char*)txt, length-sizeof(bagl_component_t));
+        io_seproxyhal_spi_send((const uint8_t *) &el->component, sizeof(bagl_component_t));
+        io_seproxyhal_spi_send((const uint8_t *) txt, length-sizeof(bagl_component_t));
 #endif // !HAVE_SE_SCREEN || (HAVE_SE_SCREEN && HAVE_PRINTF)
       }
     }
@@ -841,7 +874,7 @@ void io_seproxyhal_display_default(const bagl_element_t* element) {
       G_io_seproxyhal_spi_buffer[1] = length>>8;
       G_io_seproxyhal_spi_buffer[2] = length;
       io_seproxyhal_spi_send(G_io_seproxyhal_spi_buffer, 3);
-      io_seproxyhal_spi_send((unsigned char*)&el->component, sizeof(bagl_component_t));
+      io_seproxyhal_spi_send((const uint8_t *) &el->component, sizeof(bagl_component_t));
 #endif // !HAVE_SE_SCREEN || (HAVE_SE_SCREEN && HAVE_PRINTF)
     }
   }
@@ -857,14 +890,14 @@ unsigned int bagl_label_roundtrip_duration_ms_buf(const bagl_element_t* e, const
     return 0;
   }
 
-  unsigned int text_adr = (unsigned int)PIC((unsigned int)str);
+  const char *text_adr = (const char *) PIC(str);
   unsigned int textlen = 0;
 
   // no delay, no text to display
   if (!text_adr) {
     return 0;
   }
-  textlen = strlen((const char*)text_adr);
+  textlen = strlen(text_adr);
 
   // no delay, all text fits
   textlen = textlen * average_char_width;
@@ -970,37 +1003,31 @@ void io_seproxyhal_se_reset(void) {
 #ifdef HAVE_BLE
 void io_seph_ble_enable(unsigned char enable)
 {
-  if (G_io_app.ble_ready) {
-    if (enable) {
-      G_io_app.enabling_advertising = 1;
-      G_io_app.disabling_advertising = 0;
-    }
-    else {
-      G_io_app.enabling_advertising = 0;
-      G_io_app.disabling_advertising = 1;
-    }
-    G_io_seproxyhal_spi_buffer[0] = SEPROXYHAL_TAG_BLE_SEND;
-    G_io_seproxyhal_spi_buffer[1] = 0;
-    G_io_seproxyhal_spi_buffer[2] = 3;
-    G_io_seproxyhal_spi_buffer[3] = 0x20;
-    G_io_seproxyhal_spi_buffer[4] = 0x0a;
-    G_io_seproxyhal_spi_buffer[5] = (enable ? 1 : 0);
-    io_seproxyhal_spi_send(G_io_seproxyhal_spi_buffer, 6);
-  }
+  G_io_seproxyhal_spi_buffer[0] = SEPROXYHAL_TAG_UX_CMD;
+  G_io_seproxyhal_spi_buffer[1] = 0;
+  G_io_seproxyhal_spi_buffer[2] = 1;
+  G_io_seproxyhal_spi_buffer[3] = (enable ? SEPROXYHAL_TAG_UX_CMD_BLE_ENABLE_ADV : SEPROXYHAL_TAG_UX_CMD_BLE_DISABLE_ADV);
+  io_seproxyhal_spi_send(G_io_seproxyhal_spi_buffer, 4);
 }
 
 void io_seph_ble_clear_bond_db(void)
 {
-  if (G_io_app.ble_ready) {
-    G_io_seproxyhal_spi_buffer[0] = SEPROXYHAL_TAG_BLE_SEND;
-    G_io_seproxyhal_spi_buffer[1] = 0;
-    G_io_seproxyhal_spi_buffer[2] = 2;
-    G_io_seproxyhal_spi_buffer[3] = 0xfc;
-    G_io_seproxyhal_spi_buffer[4] = 0x94;
-    io_seproxyhal_spi_send(G_io_seproxyhal_spi_buffer, 5);
-  }
+  G_io_seproxyhal_spi_buffer[0] = SEPROXYHAL_TAG_UX_CMD;
+  G_io_seproxyhal_spi_buffer[1] = 0;
+  G_io_seproxyhal_spi_buffer[2] = 1;
+  G_io_seproxyhal_spi_buffer[3] = SEPROXYHAL_TAG_UX_CMD_BLE_RESET_PAIRINGS;
+  io_seproxyhal_spi_send(G_io_seproxyhal_spi_buffer, 4);
 }
 #endif // HAVE_BLE
+
+void io_seph_ux_redisplay(void)
+{
+  G_io_seproxyhal_spi_buffer[0] = SEPROXYHAL_TAG_UX_CMD;
+  G_io_seproxyhal_spi_buffer[1] = 0;
+  G_io_seproxyhal_spi_buffer[2] = 1;
+  G_io_seproxyhal_spi_buffer[3] = SEPROXYHAL_TAG_UX_CMD_REDISPLAY;
+  io_seproxyhal_spi_send(G_io_seproxyhal_spi_buffer, 4);
+}
 
 static const unsigned char seph_io_usb_disconnect[] = {
   SEPROXYHAL_TAG_USB_CONFIG,
@@ -1444,6 +1471,7 @@ unsigned int os_io_seph_recv_and_process(unsigned int dont_process_ux_events) {
   return 0;
 }
 
+#if !defined(APP_UX)
 unsigned int os_ux_blocking(bolos_ux_params_t* params) {
   unsigned int ret;
 
@@ -1470,16 +1498,20 @@ unsigned int os_ux_blocking(bolos_ux_params_t* params) {
 
   return ret;
 }
+#endif // !defined(APP_UX)
 
 #ifdef HAVE_PRINTF
 void mcu_usb_prints(const char* str, unsigned int charcount) {
   unsigned char buf[4];
-
+#ifdef TARGET_NANOS
+  buf[0] = SEPROXYHAL_TAG_PRINTF_STATUS;
+#else
   buf[0] = SEPROXYHAL_TAG_PRINTF;
+#endif
   buf[1] = charcount >> 8;
   buf[2] = charcount;
   io_seproxyhal_spi_send(buf, 3);
-  io_seproxyhal_spi_send((unsigned char*)str, charcount);
+  io_seproxyhal_spi_send((const uint8_t *) str, charcount);
 }
 #endif // HAVE_PRINTF
 

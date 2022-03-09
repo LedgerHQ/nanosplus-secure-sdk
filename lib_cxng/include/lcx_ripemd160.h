@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 *   Ledger Nano S - Secure firmware
-*   (c) 2021 Ledger
+*   (c) 2022 Ledger
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -74,6 +74,21 @@ static inline int cx_ripemd160_init ( cx_ripemd160_t * hash )
   cx_ripemd160_init_no_throw(hash);
   return CX_RIPEMD160;
 }
+
+/**
+ * @brief   Compute a one shot Ripemd-160 digest.
+ *
+ * @param[in]  in      Input data.
+ * 
+ * @param[in]  in_len  Length of the input data.
+ * 
+ * @param[out] out     Buffer where to store the digest.
+ * 
+ * @param[in]  out_len Length of the output.
+ *
+ * @return             Size of a Ripemd-160 digest, i.e. 20 bytes.
+ */
+size_t cx_hash_ripemd160(const uint8_t *in, size_t in_len, uint8_t *out, size_t out_len);
 
 #endif
 

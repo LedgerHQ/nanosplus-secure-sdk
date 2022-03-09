@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 *   Ledger Nano S - Secure firmware
-*   (c) 2021 Ledger
+*   (c) 2022 Ledger
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -384,7 +384,7 @@ cx_err_t cx_hmac_no_throw(cx_hmac_t *hmac, uint32_t mode, const uint8_t *in, siz
  * 
  * @throws             CX_INVALID_PARAMETER
  */
-static inline int cx_hmac ( cx_hmac_t * hmac, int mode, const unsigned char * in, unsigned int len, unsigned char * mac, unsigned int mac_len )
+static inline int cx_hmac ( cx_hmac_t * hmac, uint32_t mode, const unsigned char * in, unsigned int len, unsigned char * mac, unsigned int mac_len )
 {
   CX_THROW(cx_hmac_no_throw(hmac, mode, in, len, mac, mac_len));
 

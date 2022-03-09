@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 *   Ledger Nano S - Secure firmware
-*   (c) 2021 Ledger
+*   (c) 2022 Ledger
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -315,7 +315,9 @@ extern ux_state_t G_ux;
 #else // COMPLIANCE_UX_160
 
 extern ux_state_t G_ux;
+#if !defined(APP_UX)
 extern bolos_ux_params_t G_ux_params;
+#endif // !defined(APP_UX)
 
 /**
  * Initialize the user experience structure
@@ -480,7 +482,7 @@ extern bolos_ux_params_t G_ux_params;
 /**
  * internal bolos ux event processing with callback in case event is to be processed by the application
  */
-#define UX_FORWARD_EVENT(callback, ignoring_app_if_ux_busy) UX_FORWARD_EVENT_REDRAWCB(0, G_ux_params, G_ux, os_ux, os_sched_last_status, callback, UX_REDISPLAY(), ignoring_app_if_ux_busy);
+#define UX_FORWARD_EVENT(callback, ignoring_app_if_ux_busy) UX_FORWARD_EVENT_REDRAWCB(0, G_ux_params, G_io_asynch_ux_callback, os_ux, os_sched_last_status, callback, UX_REDISPLAY(), ignoring_app_if_ux_busy);
 
 #define UX_CONTINUE_DISPLAY_APP(displayed_callback) \
     UX_DISPLAY_NEXT_ELEMENT(); \
@@ -617,19 +619,19 @@ void io_seproxyhal_backlight(unsigned int flags, unsigned int backlight_percenta
 /**
  * Helper function to send the given bitmap splitting into multiple DISPLAY_RAW packet as the bitmap is not meant to fit in a single SEPROXYHAL packet.
  */
-void io_seproxyhal_display_icon(bagl_component_t* icon_component, bagl_icon_details_t* icon_details);
+void io_seproxyhal_display_icon(const bagl_component_t* icon_component, const bagl_icon_details_t* icon_details);
 
 /**
  * Helper method on the Blue to output icon header to the MCU and allow for bitmap transformation
  */
-unsigned int io_seproxyhal_display_icon_header_and_colors(bagl_component_t* icon_component, bagl_icon_details_t* icon_details, unsigned int* icon_len);
+unsigned int io_seproxyhal_display_icon_header_and_colors(const bagl_component_t* icon_component, const bagl_icon_details_t* icon_details, unsigned int* icon_len);
 
 // discriminated from io to allow for different memory placement
 typedef struct ux_seph_s {
   unsigned int button_mask;
   unsigned int button_same_mask_counter;
 #ifdef TARGET_BLUE
-  bagl_element_t *last_touched_not_released_component;
+  const bagl_element_t *last_touched_not_released_component;
 #endif // TARGET_BLUE
 #ifdef HAVE_BOLOS
   unsigned int ux_id;

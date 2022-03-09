@@ -70,24 +70,25 @@ LDFLAGS  += -Wall
 LDFLAGS  += -fno-common -ffunction-sections -fdata-sections -fwhole-program
 LDFLAGS  += -mno-unaligned-access
 LDFLAGS  += -Wl,--gc-sections -Wl,-Map,debug/app.map
-LDFLAGS  += --specs=nano.specs
 
-ifeq ($(TARGET_NAME),TARGET_NANOS)
+ifeq ($(TARGET_NAME),$(filter $(TARGET_NAME),TARGET_NANOS TARGET_BLUE))
 CFLAGS   += --target=armv6m-none-eabi -mthumb
 CFLAGS   += -mcpu=cortex-m0plus -mthumb  -mtune=cortex-m0plus
 AFLAGS   += -mcpu=cortex-m0plus -mtune=cortex-m0plus -mthumb
 LDFLAGS  += -mcpu=cortex-m0plus -mthumb
+LDFLAGS  += -nostartfiles --specs=nano.specs
 endif
 
 ifeq ($(TARGET_NAME),TARGET_NANOX)
 CFLAGS   += -frwpi
 LDFLAGS  += -momit-leaf-frame-pointer
 CFLAGS   += --target=armv6m-none-eabi -mthumb
-LDFLAGS  += -mthumb
-LDFLAGS  += -mtune=cortex-m0plus -mlittle-endian
+LDFLAGS  += --target=armv6m-none-eabi -mthumb
+LDFLAGS  += -mtune=cortex-m0plus -mlittle-endian  -mcpu=cortex-m0plus
 LDFLAGS  += -nostdlib -nodefaultlibs #-nostartfiles
 LDFLAGS  += -mno-movt
 LDFLAGS  += -L$(BOLOS_SDK)/lib/
+AFLAGS   += -mcpu=cortex-m0plus -mtune=cortex-m0plus -mthumb
 endif
 
 ifeq ($(TARGET_NAME),TARGET_NANOS2)
@@ -108,7 +109,6 @@ DEFINES += HAVE_BAGL_FONT_OPEN_SANS_LIGHT_16PX
 DEFINES += HAVE_UX_FLOW
 
 LDFLAGS  += -L$(BOLOS_SDK)/lib/
-
 endif
 
 ifeq ($(TARGET_NAME),$(filter $(TARGET_NAME),TARGET_NANOX TARGET_NANOS2))

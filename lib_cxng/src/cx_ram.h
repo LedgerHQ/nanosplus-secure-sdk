@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 *   Ledger Nano S - Secure firmware
-*   (c) 2021 Ledger
+*   (c) 2022 Ledger
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@
 #include "cx_sha3.h"
 #include "cx_sha256.h"
 #include "cx_sha512.h"
+#include "cx_ripemd160.h"
+#include "cx_blake3.h"
 
 /** 1K RAM lib */
 union cx_u {
@@ -67,7 +69,15 @@ union cx_u {
 #if defined(HAVE_GROESTL)
   cx_xgroestl_t groestl;
 #endif
+
+#if defined(HAVE_RIPEMD160)
+  cx_ripemd160_t ripemd160;
+#endif // HAVE_RIPEMD160
 #endif
+
+#if defined(HAVE_BLAKE3)
+  cx_blake3_t blake3;
+#endif // HAVE_BLAKE3
 
 #ifdef HAVE_HMAC
   cx_hmac_t hmac;
@@ -80,7 +90,6 @@ union cx_u {
   cx_hmac_sha256_t hmac_sha256;
 #endif
 #endif
-
 
 #ifdef HAVE_RNG_RFC6979
   cx_rnd_rfc6979_ctx_t rfc6979;

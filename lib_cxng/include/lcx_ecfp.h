@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 *   Ledger Nano S - Secure firmware
-*   (c) 2021 Ledger
+*   (c) 2022 Ledger
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -192,7 +192,7 @@ cx_err_t cx_ecfp_add_point_no_throw(cx_curve_t curve, uint8_t *R, const uint8_t 
  * @throws           CX_EC_INVALID_POINT
  * @throws           CX_EC_INFINITE_POINT
  */
-static inline int cx_ecfp_add_point ( cx_curve_t curve, unsigned char * R, const unsigned char * P, const unsigned char * Q, unsigned int X_len )
+static inline size_t cx_ecfp_add_point ( cx_curve_t curve, unsigned char * R, const unsigned char * P, const unsigned char * Q, unsigned int X_len )
 {
   UNUSED(X_len);
 
@@ -261,7 +261,7 @@ cx_err_t cx_ecfp_scalar_mult_no_throw(cx_curve_t curve, uint8_t *P, const uint8_
  * @throws               CX_INVALID_PARAMETER
  * @throws               CX_EC_INFINITE_POINT
  */
-static inline int cx_ecfp_scalar_mult ( cx_curve_t curve, unsigned char * P, unsigned int P_len, const unsigned char * k, unsigned int k_len )
+static inline size_t cx_ecfp_scalar_mult ( cx_curve_t curve, unsigned char * P, unsigned int P_len, const unsigned char * k, unsigned int k_len )
 {
   UNUSED(P_len);
 
@@ -327,7 +327,7 @@ cx_err_t cx_ecfp_init_public_key_no_throw(cx_curve_t            curve,
  * @throws             CX_EC_INVALID_CURVE
  * @throws             INVALID_PARAMETER
  */
-static inline int cx_ecfp_init_public_key ( cx_curve_t curve, const unsigned char * rawkey, unsigned int key_len, cx_ecfp_public_key_t * key )
+static inline size_t cx_ecfp_init_public_key ( cx_curve_t curve, const unsigned char * rawkey, unsigned int key_len, cx_ecfp_public_key_t * key )
 {
   CX_THROW(cx_ecfp_init_public_key_no_throw(curve, rawkey, key_len, key));
   return key_len;
@@ -380,7 +380,7 @@ cx_err_t cx_ecfp_init_private_key_no_throw(cx_curve_t             curve,
  * @throws             CX_EC_INVALID_CURVE
  * @throws             CX_INVALID_PARAMETER
  */
-static inline int cx_ecfp_init_private_key ( cx_curve_t curve, const unsigned char * rawkey, unsigned int key_len, cx_ecfp_private_key_t * pvkey )
+static inline size_t cx_ecfp_init_private_key ( cx_curve_t curve, const unsigned char * rawkey, size_t key_len, cx_ecfp_private_key_t * pvkey )
 {
   CX_THROW(cx_ecfp_init_private_key_no_throw(curve, rawkey, key_len, pvkey));
   return key_len;

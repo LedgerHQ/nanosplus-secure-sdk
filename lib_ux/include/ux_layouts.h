@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 *   Ledger Nano S - Secure firmware
-*   (c) 2021 Ledger
+*   (c) 2022 Ledger
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -125,7 +125,7 @@ void ux_layout_paging_reset(void);
 
 // deprecation
 #define ux_layout_bnnn_paging_params_t ux_layout_paging_params_t
-#define ux_layout_bnnn_paging_init ux_layout_paging_init
+#define ux_layout_bnnn_paging_init ux_layout_bn_paging_init
 #define ux_layout_bnnn_paging_reset ux_layout_paging_reset
 #define ux_layout_bn_paging_reset ux_layout_paging_reset
 

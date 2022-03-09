@@ -49,9 +49,10 @@ SYSCALL PERMISSION(APPLICATION_FLAG_BOLOS_UX) void os_perso_finalize(void);
 // @return BOLOS_UX_OK when perso is onboarded.
 SYSCALL bolos_bool_t os_perso_isonboarded(void);
 
-SYSCALL void os_perso_set_onboarding_status(unsigned int kind,
+SYSCALL void os_perso_set_onboarding_status(unsigned int pin_set,
+                                            unsigned int kind,
                                             unsigned int count,
-                                            unsigned int maxCount,
+                                            unsigned int total,
                                             unsigned int isConfirming);
 
 // derive the seed for the requested BIP32 path

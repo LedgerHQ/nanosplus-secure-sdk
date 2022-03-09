@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 *   Ledger Nano S - Secure firmware
-*   (c) 2021 Ledger
+*   (c) 2022 Ledger
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -1071,5 +1071,9 @@ SYSCALL cx_err_t cx_bn_next_prime(cx_bn_t n);
  *               - CX_MEMORY_FULL
  */
 SYSCALL cx_err_t cx_bn_rng(cx_bn_t r, const cx_bn_t n);
+
+SYSCALL cx_err_t cx_bn_gf2_n_mul(cx_bn_t bn_r, const cx_bn_t bn_a,
+                                 const cx_bn_t bn_b, const cx_bn_t bn_n,
+                                 const cx_bn_t bn_h);
 
 #endif /* CX_BN_H */

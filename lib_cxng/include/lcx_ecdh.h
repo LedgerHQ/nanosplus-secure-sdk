@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 *   Ledger Nano S - Secure firmware
-*   (c) 2021 Ledger
+*   (c) 2022 Ledger
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -115,7 +115,7 @@ cx_err_t cx_ecdh_no_throw(const cx_ecfp_private_key_t *pvkey,
  * @throws                  CX_INVALID_PARAMETER_SIZE
  * @throws                  CX_EC_INFINITE_POINT
  */
-static inline int cx_ecdh ( const cx_ecfp_private_key_t * pvkey, int mode, const unsigned char * P, unsigned int P_len, unsigned char * secret, unsigned int secret_len )
+static inline size_t cx_ecdh ( const cx_ecfp_private_key_t * pvkey, uint32_t mode, const unsigned char * P, unsigned int P_len, unsigned char * secret, unsigned int secret_len )
 {
   CX_THROW(cx_ecdh_no_throw(pvkey, mode, P, P_len, secret, secret_len));
 

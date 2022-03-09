@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 *   Ledger Nano S - Secure firmware
-*   (c) 2021 Ledger
+*   (c) 2022 Ledger
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -129,7 +129,7 @@ cx_err_t cx_ecdsa_sign_no_throw(const cx_ecfp_private_key_t *pvkey,
  * @throws              CX_EC_INFINITE_POINT
  * @throws              CX_INVALID_PARAMETER_VALUE
  */
-static inline int cx_ecdsa_sign ( const cx_ecfp_private_key_t * pvkey, int mode, cx_md_t hashID, const unsigned char * hash, unsigned int hash_len, unsigned char * sig, unsigned int sig_len, unsigned int * info )
+static inline size_t cx_ecdsa_sign ( const cx_ecfp_private_key_t * pvkey, uint32_t mode, cx_md_t hashID, const unsigned char * hash, unsigned int hash_len, unsigned char * sig, unsigned int sig_len, unsigned int * info )
 {
   size_t sig_len_ = sig_len;
   uint32_t info_;
@@ -185,7 +185,7 @@ bool cx_ecdsa_verify_no_throw(const cx_ecfp_public_key_t *pukey,
  * 
  * @return             1 if the signature is verified, 0 otherwise.
  */
-static inline bool cx_ecdsa_verify ( const cx_ecfp_public_key_t * pukey, int mode, cx_md_t hashID, const unsigned char * hash, unsigned int hash_len, unsigned char * sig, unsigned int sig_len)
+static inline bool cx_ecdsa_verify ( const cx_ecfp_public_key_t * pukey, int mode, cx_md_t hashID, const unsigned char * hash, unsigned int hash_len, const unsigned char * sig, unsigned int sig_len)
 {
   UNUSED(mode);
   UNUSED(hashID);

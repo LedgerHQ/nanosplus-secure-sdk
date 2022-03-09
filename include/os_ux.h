@@ -12,6 +12,7 @@
 /* -                            UX DEFINITIONS                           - */
 /* ----------------------------------------------------------------------- */
 
+#if !defined(APP_UX)
 #if !defined(HAVE_BOLOS)
 
 // Enumeration of the UX events usable by the UX library.
@@ -24,11 +25,11 @@ typedef enum bolos_ux_e {
   BOLOS_UX_STATUS_BAR,
 #endif // TARGET_BLUE
 
-  BOLOS_UX_VALIDATE_PIN = 14,
+  BOLOS_UX_VALIDATE_PIN = 15,
 
 #if defined(HAVE_BLE)
   BOLOS_UX_ASYNCHMODAL_PAIRING_REQUEST =
-      35, // ask the ux to display a modal to accept/reject the current pairing
+      36, // ask the ux to display a modal to accept/reject the current pairing
           // request
   BOLOS_UX_ASYNCHMODAL_PAIRING_CANCEL,
 #endif // HAVE_BLE
@@ -82,7 +83,7 @@ typedef struct bolos_ux_params_s {
        // defined(HAVE_KEYBOARD_UX))
 } bolos_ux_params_t;
 
-#endif // ! HAVE_BOLOS
+#endif // !defined(HAVE_BOLOS)
 
 /* ----------------------------------------------------------------------- */
 /* -                             UX-RELATED                              - */
@@ -103,6 +104,7 @@ os_ux_result(bolos_ux_params_t *params PLENGTH(sizeof(bolos_ux_params_t)));
 // when returning the application must send a general status (or continue its
 // command flow)
 unsigned int os_ux_blocking(bolos_ux_params_t *params);
+#endif // !defined(APP_UX)
 
 #ifdef HAVE_BLE
 SYSCALL void os_ux_set_status(unsigned int ux_id, unsigned int status);

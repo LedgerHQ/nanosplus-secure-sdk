@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 *   Ledger Nano S - Secure firmware
-*   (c) 2021 Ledger
+*   (c) 2022 Ledger
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@
 #include "lcx_sha3.h"
 #include "lcx_blake2.h"
 #include "lcx_groestl.h"
+#include "lcx_blake3.h"
 
 /* ======================================================================= */
 /*                                 HASH MAC                                */
@@ -91,6 +92,13 @@
 /* ======================================================================= */
 
 #include "lcx_aes.h"
+#include "lcx_aes_gcm.h"
+
+/* ======================================================================= */
+/*                                   AEAD                                  */
+/* ======================================================================= */
+
+#include "lcx_aead.h"
 
 /* ======================================================================= */
 /*                                   RSA                                   */

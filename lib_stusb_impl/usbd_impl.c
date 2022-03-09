@@ -61,6 +61,9 @@
 #include "usbd_def.h"
 #include "os_io_seproxyhal.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-qual"
+
 #ifdef HAVE_IO_U2F
 #include "u2f_transport.h"
 #include "u2f_impl.h"
@@ -122,6 +125,20 @@
 #ifdef HAVE_VID_PID_PROBER
 #define USBD_VID                      0x2581
 #define USBD_PID                      0xf1d1
+static uint8_t const USBD_PRODUCT_FS_STRING[] = {
+  10*2+2,
+  USB_DESC_TYPE_STRING,
+  'N', 0,
+  'a', 0,
+  'n', 0,
+  'o', 0,
+  '-', 0,
+  'U', 0,
+  '2', 0,
+  'F', 0,
+  '-', 0,
+  'P', 0,
+};
 #else
 #define USBD_VID                      0x2C97
 #if defined(TARGET_BLUE)
@@ -1520,6 +1537,7 @@ void USB_power(unsigned char enabled) {
   }
 }
 
+#pragma GCC diagnostic pop
 /**
   * @}
   */
