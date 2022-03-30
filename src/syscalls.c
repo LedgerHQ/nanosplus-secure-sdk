@@ -1194,10 +1194,10 @@ unsigned short io_seph_recv ( unsigned char * buffer, unsigned short maxlength, 
   return (unsigned short) SVC_Call(SYSCALL_io_seph_recv_ID, parameters);
 }
 
-void nvm_write_page ( unsigned int page_adr ) {
+void nvm_write_page(unsigned int page_adr, bool force) {
   unsigned int parameters[2];
-  parameters[0] = (unsigned int)page_adr;
-  parameters[1] = 0;
+  parameters[0] = (unsigned int) page_adr;
+  parameters[1] = (unsigned int) force;
   SVC_Call(SYSCALL_nvm_write_page_ID, parameters);
   return;
 }
