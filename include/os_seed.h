@@ -49,11 +49,19 @@ SYSCALL PERMISSION(APPLICATION_FLAG_BOLOS_UX) void os_perso_finalize(void);
 // @return BOLOS_UX_OK when perso is onboarded.
 SYSCALL bolos_bool_t os_perso_isonboarded(void);
 
-SYSCALL void os_perso_set_onboarding_status(unsigned int pin_set,
-                                            unsigned int kind,
+enum {
+  ONBOARDING_STATUS_WELCOME = 0,
+  ONBOARDING_STATUS_SETUP_CHOICE,
+  ONBOARDING_STATUS_PIN,
+  ONBOARDING_STATUS_NEW_DEVICE,
+  ONBOARDING_STATUS_NEW_DEVICE_CONFIRMING,
+  ONBOARDING_STATUS_RESTORE_SEED,
+  ONBOARDING_STATUS_SAFETY_WARNINGS,
+  ONBOARDING_STATUS_READY,
+};
+SYSCALL void os_perso_set_onboarding_status(unsigned int state,
                                             unsigned int count,
-                                            unsigned int total,
-                                            unsigned int isConfirming);
+                                            unsigned int total);
 
 // derive the seed for the requested BIP32 path
 SYSCALL void os_perso_derive_node_bip32(

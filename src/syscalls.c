@@ -824,13 +824,11 @@ bolos_bool_t os_perso_isonboarded ( void ) {
   return (bolos_bool_t) SVC_Call(SYSCALL_os_perso_isonboarded_ID, parameters);
 }
 
-void os_perso_set_onboarding_status (unsigned int pin_set, unsigned int kind, unsigned int count, unsigned int maxCount, unsigned int isConfirming ) {
-  unsigned int parameters [5];
-  parameters[0] = (unsigned int)pin_set;
-  parameters[1] = (unsigned int)kind;
-  parameters[2] = (unsigned int)count;
-  parameters[3] = (unsigned int)maxCount;
-  parameters[4] = (unsigned int)isConfirming;
+void os_perso_set_onboarding_status(unsigned int state, unsigned int count, unsigned int total) {
+  unsigned int parameters [3];
+  parameters[0] = (unsigned int)state;
+  parameters[1] = (unsigned int)count;
+  parameters[2] = (unsigned int)total;
   SVC_Call(SYSCALL_os_perso_setonboardingstatus_ID, parameters);
   return;
 }
@@ -1275,6 +1273,23 @@ unsigned int os_deny_protected_flash( void ) {
   parameters[1] = 0;
   return (unsigned int) SVC_Call(SYSCALL_os_deny_protected_flash_ID, parameters);
 }
+
+#ifdef HAVE_CUSTOM_CA_SETTINGS
+bolos_bool_t os_bolos_custom_ca_get_info(char* name, uint8_t* pubkey) {
+  unsigned int parameters[2];
+  parameters[0] = (unsigned int) name;
+  parameters[1] = (unsigned int) pubkey;
+  bolos_bool_t ret = (bolos_bool_t) SVC_Call(SYSCALL_os_bolos_custom_ca_get_info_ID, parameters);
+  return ret;
+}
+
+void os_bolos_custom_ca_revoke(void) {
+  unsigned int parameters[1];
+  parameters[0] = 0;
+  SVC_Call(SYSCALL_os_bolos_custom_ca_revoke_ID, parameters);
+  return;
+}
+#endif //HAVE_CUSTOM_CA_SETTINGS
 
 #ifdef HAVE_MCU_SERIAL_STORAGE
 unsigned int os_seph_serial ( unsigned char * serial, unsigned int maxlength ) {

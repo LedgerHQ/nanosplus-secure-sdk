@@ -108,7 +108,8 @@ enum generic_identifiers {
   ERR_GEN_ID_28,
   ERR_GEN_ID_29,
   ERR_GEN_ID_2A,
-  ERR_GEN_ID_2B
+  ERR_GEN_ID_2B,
+  ERR_GEN_ID_2C
 };
 
 /**
@@ -364,6 +365,7 @@ enum generic_identifiers {
 #define SWO_SEC_CRC_21 (ERR_SEC_CRC + ERR_GEN_ID_21) // 0x5221
 #define SWO_SEC_CRC_22 (ERR_SEC_CRC + ERR_GEN_ID_22) // 0x5222
 #define SWO_SEC_CRC_23 (ERR_SEC_CRC + ERR_GEN_ID_23) // 0x5223
+#define SWO_SEC_CRC_24 (ERR_SEC_CRC + ERR_GEN_ID_24) // 0x5224
 
 #define SWO_SEC_CHK_01 (ERR_SEC_CHK + ERR_GEN_ID_01) // 0x5301
 #define SWO_SEC_CHK_02 (ERR_SEC_CHK + ERR_GEN_ID_02) // 0x5302
@@ -622,6 +624,7 @@ enum generic_identifiers {
 #define SWO_APD_STA_29 (ERR_APD_STA + ERR_GEN_ID_29) // 0x6629
 #define SWO_APD_STA_2A (ERR_APD_STA + ERR_GEN_ID_2A) // 0x662A
 #define SWO_APD_STA_2B (ERR_APD_STA + ERR_GEN_ID_2B) // 0x662B
+#define SWO_APD_STA_2C (ERR_APD_STA + ERR_GEN_ID_2C) // 0x662C
 
 /**
  * The process is successful.

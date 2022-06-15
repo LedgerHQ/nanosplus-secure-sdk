@@ -23,6 +23,12 @@
 #include "bagl_font_open_sans_light_16px.inc"
 #include "bagl_font_open_sans_regular_11px.inc"
 
+#ifdef HAVE_BOLOS
+#include "bagl_font_open_sans_extrabold_11px_unicode.inc"
+#include "bagl_font_open_sans_light_16px_unicode.inc"
+#include "bagl_font_open_sans_regular_11px_unicode.inc"
+#endif //HAVE_BOLOS
+
 // Blue
 #include "bagl_font_open_sans_light_16_22px.inc"
 

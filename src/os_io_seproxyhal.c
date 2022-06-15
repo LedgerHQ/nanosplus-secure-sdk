@@ -79,6 +79,7 @@
 extern USBD_HandleTypeDef USBD_Device;
 #endif
 #endif
+#include "os.h"
 
 #if !defined(HAVE_BOLOS_NO_DEFAULT_APDU)
 # define DEFAULT_APDU_CLA                         0xB0
@@ -220,7 +221,6 @@ void io_seproxyhal_handle_usb_ep_xfer_event(void) {
 // TODO add a blocking parameter, for HID KBD sending, or use a USB busy flag per channel to know if
 // the transfer has been processed or not. and move on to the next transfer on the same endpoint
 void io_usb_send_ep(unsigned int ep, unsigned char* buffer, unsigned short length, unsigned int timeout) {
-
   // don't spoil the timeout :)
   if (timeout) {
     timeout++;
@@ -366,7 +366,7 @@ unsigned int io_seproxyhal_handle_event(void) {
         }
       }
 #endif // HAVE_BLE_APDU
-      __attribute__((fallthrough));
+      FALL_THROUGH;
       // no break is intentional
     default:
       return io_event(CHANNEL_SPI);
@@ -804,6 +804,12 @@ void io_seproxyhal_display_icon(const bagl_component_t* icon_component, const ba
                             +1 /* bpp */
                             +h /* color index */
                             +w; /* image bitmap size */
+    if (length > (sizeof(G_io_seproxyhal_spi_buffer)-4)) {
+#if defined(HAVE_PRINTF)
+      PRINTF("ERROR: Inside io_seproxyhal_display_icon, icon size (%d) is too big for the buffer (%d-4)! (bitmap=0x%x, width=%d, height=%d, bpp=%d)\n", length, sizeof(G_io_seproxyhal_spi_buffer), icon_details->bitmap, icon_details->width, icon_details->height, icon_details->bpp);
+#endif //defined(HAVE_PRINTF)
+      return;
+    }
     G_io_seproxyhal_spi_buffer[0] = SEPROXYHAL_TAG_SCREEN_DISPLAY_STATUS;
 #if defined(HAVE_SE_SCREEN) && defined(HAVE_PRINTF)
     G_io_seproxyhal_spi_buffer[0] = SEPROXYHAL_TAG_DBG_SCREEN_DISPLAY_STATUS;
@@ -839,13 +845,23 @@ void io_seproxyhal_display_default(const bagl_element_t* element) {
       }
       else {
 #ifdef HAVE_SE_SCREEN
-        bagl_draw_with_context(&el->component, txt, strlen(txt), BAGL_ENCODING_LATIN1);
+        bagl_draw_with_context(&el->component, txt, strlen(txt), BAGL_ENCODING_DEFAULT);
 #endif // HAVE_SE_SCREEN
 #if !defined(HAVE_SE_SCREEN) || (defined(HAVE_SE_SCREEN) && defined(HAVE_PRINTF))
         if (io_seproxyhal_spi_is_status_sent()) {
           return;
         }
-        unsigned short length = sizeof(bagl_component_t)+strlen((const char*)txt);
+        // io_seph_send crash when using txt from language packs...
+        // ...let's use an intermediate buffer to store txt
+        char buffer[128];
+        strlcpy(buffer, txt, sizeof(buffer));
+        unsigned short length = sizeof(bagl_component_t)+strlen(buffer);
+        if (length > (sizeof(G_io_seproxyhal_spi_buffer)-3)) {
+#if defined(HAVE_PRINTF)
+          PRINTF("ERROR: Inside io_seproxyhal_display_default, length (%d) is too big for G_io_seproxyhal_spi_buffer(%d)!\n", length+3, sizeof(G_io_seproxyhal_spi_buffer));
+#endif //defined(HAVE_PRINTF)
+          return;
+        }
         G_io_seproxyhal_spi_buffer[0] = SEPROXYHAL_TAG_SCREEN_DISPLAY_STATUS;
 #if defined(HAVE_SE_SCREEN) && defined(HAVE_PRINTF)
         G_io_seproxyhal_spi_buffer[0] = SEPROXYHAL_TAG_DBG_SCREEN_DISPLAY_STATUS;
@@ -853,8 +869,8 @@ void io_seproxyhal_display_default(const bagl_element_t* element) {
         G_io_seproxyhal_spi_buffer[1] = length>>8;
         G_io_seproxyhal_spi_buffer[2] = length;
         io_seproxyhal_spi_send(G_io_seproxyhal_spi_buffer, 3);
-        io_seproxyhal_spi_send((const uint8_t *) &el->component, sizeof(bagl_component_t));
-        io_seproxyhal_spi_send((const uint8_t *) txt, length-sizeof(bagl_component_t));
+        io_seproxyhal_spi_send((const uint8_t *)&el->component, sizeof(bagl_component_t));
+        io_seproxyhal_spi_send((const uint8_t *)buffer, strlen(buffer));
 #endif // !HAVE_SE_SCREEN || (HAVE_SE_SCREEN && HAVE_PRINTF)
       }
     }
@@ -1256,7 +1272,7 @@ reply_apdu:
             if (io_exchange_al(channel, tx_len) == 0) {
               goto break_send;
             }
-            __attribute__((fallthrough));
+            FALL_THROUGH;
           case APDU_IDLE:
             LOG("invalid state for APDU reply\n");
             THROW(INVALID_STATE);
@@ -1460,7 +1476,7 @@ unsigned int os_io_seph_recv_and_process(unsigned int dont_process_ux_events) {
       if (dont_process_ux_events) {
         return 0;
       }
-      __attribute__((fallthrough));
+      FALL_THROUGH;
 
     default:
       // if malformed, then a stall is likely to occur

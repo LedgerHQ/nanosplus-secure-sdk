@@ -31,7 +31,7 @@
 #include "decorators.h"
 
 /**
- * @brief   Get random data from the True Random Number Generation.
+ * @brief   Gets random data from the True Random Number Generation.
  *
  * @param[out] buf  Buffer where to store the random data.
  *
