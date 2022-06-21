@@ -21,18 +21,13 @@ typedef enum bolos_ux_e {
   BOLOS_UX_EVENT,
   BOLOS_UX_KEYBOARD,
   BOLOS_UX_WAKE_UP,
-#if defined(TARGET_BLUE)
   BOLOS_UX_STATUS_BAR,
-#endif // TARGET_BLUE
 
-  BOLOS_UX_VALIDATE_PIN = 15,
-
-#if defined(HAVE_BLE)
-  BOLOS_UX_ASYNCHMODAL_PAIRING_REQUEST =
-      36, // ask the ux to display a modal to accept/reject the current pairing
-          // request
+  BOLOS_UX_VALIDATE_PIN,
+  BOLOS_UX_ASYNCHMODAL_PAIRING_REQUEST, // ask the ux to display a modal to
+                                        // accept/reject the current pairing
+                                        // request
   BOLOS_UX_ASYNCHMODAL_PAIRING_CANCEL,
-#endif // HAVE_BLE
   BOLOS_UX_LAST_ID,
 } bolos_ux_t;
 

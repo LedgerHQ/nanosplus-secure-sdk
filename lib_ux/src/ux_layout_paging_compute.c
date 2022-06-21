@@ -221,7 +221,7 @@ unsigned int ux_layout_paging_compute(const char* text_to_split,
       ) {
       // compute new line length
 #ifdef HAVE_FONTS
-      linew = bagl_compute_line_width(font, 0, start, len+1, BAGL_ENCODING_LATIN1);
+      linew = bagl_compute_line_width(font, 0, start, len+1, BAGL_ENCODING_DEFAULT);
 #else // HAVE_FONTS
       linew = se_compute_line_width_light(start, len + 1, G_ux.layout_paging.format);
 #endif //HAVE_FONTS

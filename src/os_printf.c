@@ -18,6 +18,7 @@
 
 #include <stdarg.h>
 #include <string.h>
+#include "decorators.h"
 
 #if defined(HAVE_BOLOS)
 # include "bolos_target.h"
@@ -407,7 +408,7 @@ s_pad:
                 //
                 case 'X':
                     ulCap = 1;
-                    __attribute__((fallthrough));
+                    FALL_THROUGH;
                 case 'x':
                 case 'p':
                 {
@@ -974,7 +975,7 @@ s_pad:
                 case 'X':
                     ulCap = 1;
 #if !defined(__clang__)
-                    __attribute__((fallthrough));
+                    FALL_THROUGH;
 #endif // !defined(__clang__)
                 case 'x':
                 case 'p':

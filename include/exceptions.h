@@ -137,7 +137,8 @@ SUDOCALL try_context_t *try_context_set(try_context_t *context);
     /* rethrow */                                                              \
     THROW_L(L, __try##L.ex);                                                   \
   }                                                                            \
-  }
+  }                                                                            \
+  _Static_assert(true, "")
 
 // -----------------------------------------------------------------------
 // - EXCEPTION THROW

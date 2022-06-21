@@ -30,7 +30,7 @@
 #include "decorators.h"
 
 /**
- * @brief Calculate a 32-bit cyclic redundancy check.
+ * @brief Calculates a 32-bit cyclic redundancy check.
  *
  * @param[in] buf Pointer to the buffer to check.
  *

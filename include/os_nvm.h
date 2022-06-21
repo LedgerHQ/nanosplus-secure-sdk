@@ -2,14 +2,9 @@
 
 #include "bolos_target.h"
 #include "decorators.h"
-
 #include <stdbool.h>
 
-#if defined(ST31)
-#define NVM_ERASED_WORD_VALUE 0xFFFFFFFFUL
-#elif defined(ST33) | defined(ST33K1M5)
 #define NVM_ERASED_WORD_VALUE 0xFFFFFFFF
-#endif
 
 // write in persistent memory, to make things easy keep a layout of the memory
 // in a structure and update fields upon needs The function throws exception

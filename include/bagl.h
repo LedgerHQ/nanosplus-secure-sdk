@@ -125,7 +125,7 @@ typedef struct {
 } bagl_glyph_array_entry_t;
 
 extern bagl_glyph_array_entry_t const C_glyph_array[];
-extern unsigned int const C_glyph_count;
+extern const unsigned int C_glyph_count;
 #endif // HAVE_BAGL_GLYPH_ARRAY
 
 // --------------------------------------------------------------------------------------
@@ -154,9 +154,48 @@ typedef struct {
 
 extern const bagl_font_t *const C_bagl_fonts[];
 #define PIC_FONT(x) ((bagl_font_t const *)PIC(x))
-extern const unsigned int C_bagl_fonts_count;
 
 #define BAGL_ENCODING_LATIN1 0
+#define BAGL_ENCODING_UTF8 1
+
+#ifndef HAVE_BOLOS
+#define BAGL_ENCODING_DEFAULT BAGL_ENCODING_LATIN1
+
+#else // HAVE_BOLOS
+#define BAGL_ENCODING_DEFAULT BAGL_ENCODING_UTF8
+
+typedef struct {
+  unsigned int
+      char_unicode; // unicode = plane value from 0 to 16 then 16-bit code.
+  unsigned char char_width;
+  unsigned char bitmap_byte_count;
+  // unsigned char const * bitmap; // save space by only keeping the offset (2
+  // bytes) instead of the char address (4 bytes)
+  unsigned short bitmap_offset;
+} bagl_font_unicode_character_t;
+
+typedef struct {
+  unsigned int font_id; // to allow for sparse font embedding with a linear enum
+  unsigned char bpp;    // for antialiased fonts
+  unsigned char char_height;
+  unsigned char baseline_height;
+  unsigned char char_kerning; // specific to the font
+  unsigned int first_unicode_char;
+  unsigned int last_unicode_char;
+  const bagl_font_unicode_character_t *const characters;
+  unsigned char const *bitmap; // single bitmap for all chars of a font
+} bagl_font_unicode_t;
+
+// ----------------------------------------------------------------------------
+extern const bagl_font_unicode_t *const C_bagl_fonts_unicode[];
+extern const unsigned int C_unicode_characters_count;
+
+#define PIC_CHARU(x) ((const bagl_font_unicode_character_t *)PIC(x))
+#define PIC_BMPU(x) ((unsigned char const *)PIC(x))
+#define PIC_FONTU(x) ((bagl_font_unicode_t const *)(PIC(x)))
+#endif // HAVE_BOLOS
+
+extern const unsigned int C_bagl_fonts_count;
 
 #define BAGL_FONT_OPEN_SANS_LIGHT_14px BAGL_FONT_OPEN_SANS_REGULAR_11_14PX
 typedef enum {
@@ -245,6 +284,7 @@ enum bagl_glyph_e {
   BAGL_GLYPH_BADGE_BLUE,
   BAGL_GLYPH_ICON_BRIGHTNESS_LOW_BLUE,
   BAGL_GLYPH_ICON_BRIGHTNESS_HIGH_BLUE,
+  NB_BAGL_GLYPH_ICON
 };
 
 // --------------------------------------------------------------------------------------
