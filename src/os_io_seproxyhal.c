@@ -758,14 +758,13 @@ void io_seproxyhal_display_icon(const bagl_component_t* icon_component, const ba
     memcpy(&icon_component_mod, PIC(icon_component), sizeof(bagl_component_t));
     icon_component_mod.width = icon_details->width;
     icon_component_mod.height = icon_details->height;
-    icon_component = &icon_component_mod;
 
 #ifdef SEPROXYHAL_TAG_SCREEN_DISPLAY_RAW_STATUS
     unsigned int len;
     unsigned int icon_len;
     unsigned int icon_off=0;
 
-    len = io_seproxyhal_display_icon_header_and_colors(icon_component, icon_details, &icon_len);
+    len = io_seproxyhal_display_icon_header_and_colors(&icon_component_mod, icon_details, &icon_len);
     io_seproxyhal_spi_send(PIC(icon_details->bitmap), len);
     // advance in the bitmap to be transmitted
     icon_len -= len;
@@ -799,7 +798,7 @@ void io_seproxyhal_display_icon(const bagl_component_t* icon_component, const ba
     // color index size
     unsigned int h = (1<<(icon_details->bpp))*sizeof(unsigned int);
     // bitmap size
-    unsigned int w = ((icon_component->width*icon_component->height*icon_details->bpp)/8)+((icon_component->width*icon_component->height*icon_details->bpp)%8?1:0);
+    unsigned int w = ((icon_component_mod.width*icon_component_mod.height*icon_details->bpp)/8)+((icon_component_mod.width*icon_component_mod.height*icon_details->bpp)%8?1:0);
     unsigned short length = sizeof(bagl_component_t)
                             +1 /* bpp */
                             +h /* color index */
@@ -817,7 +816,7 @@ void io_seproxyhal_display_icon(const bagl_component_t* icon_component, const ba
     G_io_seproxyhal_spi_buffer[1] = length>>8;
     G_io_seproxyhal_spi_buffer[2] = length;
     io_seproxyhal_spi_send(G_io_seproxyhal_spi_buffer, 3);
-    io_seproxyhal_spi_send((const uint8_t *) icon_component, sizeof(bagl_component_t));
+    io_seproxyhal_spi_send((const uint8_t *) &icon_component_mod, sizeof(bagl_component_t));
     G_io_seproxyhal_spi_buffer[0] = icon_details->bpp;
     io_seproxyhal_spi_send(G_io_seproxyhal_spi_buffer, 1);
     io_seproxyhal_spi_send((const uint8_t *) PIC(icon_details->colors), h);
