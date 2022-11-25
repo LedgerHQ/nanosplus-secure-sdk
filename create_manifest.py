@@ -22,7 +22,7 @@
 
 import sys
 import argparse
-import json
+import tomli_w
 
 def auto_int(x):
 	return int(x, 0)
@@ -69,27 +69,29 @@ def main():
 	args = get_argparser().parse_args()
 	manifest = {}
 	manifest["name"] = args.appName
-	manifest["binary"] = args.fileName
-	if args.targetId:
-		manifest["targetId"] = hex(args.targetId)
 	if args.appVersion: 
 		manifest["version"] = args.appVersion
-	if args.gif:
-		manifest["icon"] = args.gif
-	if args.appFlags: 
-		manifest["flags"] = args.appFlags
-	manifest["derivationPath"] = {}
-	if args.curve:
-		manifest["derivationPath"]["curves"] = [args.curve]
-	if args.path:
-		manifest["derivationPath"]["paths"] = [args.path]
-	if args.apiLevel:
-		manifest["apiLevel"] = args.apiLevel
-	if args.dataSize : 
-		manifest["dataSize"] = args.dataSize
+
+	if args.targetId:
+		target = hex(args.targetId)
+		manifest[target] = {}
+		manifest[target]["binary"] = args.fileName
+		if args.gif:
+			manifest[target]["icon"] = args.gif
+		if args.appFlags:
+			manifest[target]["flags"] = args.appFlags
+		manifest[target]["derivationPath"] = {}
+		if args.curve:
+			manifest[target]["derivationPath"]["curves"] = args.curve
+		if args.path:
+			manifest[target]["derivationPath"]["paths"] = args.path
+		if args.apiLevel:
+			manifest[target]["apiLevel"] = str(args.apiLevel)
+		if args.dataSize:
+			manifest[target]["dataSize"] = args.dataSize
 	
-	with open("app.json", 'w') as f:
-		json.dump(manifest, f, indent=4)
+	with open("app.toml", 'wb') as f:
+		tomli_w.dump(manifest, f)
 
 if __name__ == "__main__":
     main()
