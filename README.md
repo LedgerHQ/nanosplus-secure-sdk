@@ -1,3 +1,7 @@
+**This repository has been replaced by https://github.com/LedgerHQ/ledger-secure-sdk/.**
+
+**Please read the new repository README for more information.**
+
 # Nano S Plus Secure SDK
 
 ## Are you developing a Nano S Plus application?
